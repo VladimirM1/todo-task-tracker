@@ -1,122 +1,123 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
 
+  const [tasks, setTasks] = useState([]);
+
+  const [newTask, setNewTask] = useState("");
+
+  const [doneTasks, setDoneTasks] = useState([]);
+
+  const [priority, setPriority] = useState("Medium");
+
+  const [filter, setFilter] = useState("toDoTasks");
+  
+
+  function submitTask(event){
+    event.preventDefault();
+
+    if (newTask.trim() === ""){
+      return;
+    }
+
+    const task = {
+      id: Date.now(),
+      text: newTask,
+      createdAt: new Date(),
+      priority: priority,
+      isDone: false
+    };
+
+    setTasks([...tasks, task]);
+    setNewTask("");
+
+  }
+
+  function toggleTaskDone(taskId){
+    const taskToMove = tasks.find((task) => task.id === taskId);
+
+    if (!taskToMove){
+      return;
+    }
+
+    setTasks(tasks.filter((task) => task.id !== taskId));
+
+    setDoneTasks([
+      ...doneTasks, {...taskToMove, isDone: true}
+    ]);
+  }
+
+  function toggletaskUndone(taskId){
+    const taskToMove = doneTasks.find((task) => task.id === taskId);
+
+    if (!taskToMove){
+      return;
+    }
+
+    setDoneTasks(doneTasks.filter((task) => task.id !== taskId));
+
+    setTasks([
+      ...tasks, {...taskToMove, isDone: false}
+    ]);
+  }
+  
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <header>
+        <p className="descriptionClass"><span className="emojiClass">&#128198;</span> Personal planner</p>
+        <h1>TO DO TASK TRACKER</h1>
+        <p>Manage your tasks as you wish</p>
+      </header>
 
-      <div className="ticks"></div>
+      <main>
+        <div className="container">
+          <p>Enter your task</p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <form className="taskInput" onSubmit={submitTask}>
+            <input type="text" name="taskInput" value={newTask} onChange={(event) => setNewTask(event.target.value)} />
+            <select value={priority} onChange={(event) => setPriority(event.target.value)}>
+              <option style={{color: "blue"}} value="Low">Low</option>
+              <option style={{color: "orange"}} value="Medium">Medium</option>
+              <option style={{color: "red"}} value="High">High</option>
+            </select>
+            <button type="submit">+</button>
+          </form>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+          <div className="buttons">
+            <button onClick={() => setFilter("toDoTasks")}>See planned tasks</button>
+            <button onClick={() => setFilter("done")}>See done tasks</button>
+          </div>
+          <div className="taskList">
+            {filter === "toDoTasks" && (
+            <>
+              {tasks.map((task) => (
+                <div className={task.isDone ? "taskDone" : "task"} key={task.id}>
+                <input type="checkbox" checked={task.isDone} onChange={() => toggleTaskDone(task.id)} className={task.isDone ? "doneCheckBox" : ""} />
+                <span className={task.isdone ? "completed" : ""}> {task.text} </span>
+                <span> {task.priority}</span>
+                <span> {task.createdAt.toLocaleString()}</span>
+              </div>
+            ))}
+            </>
+            )}
+
+            {filter === "done" && (
+            <>
+              {doneTasks.map((task) => (
+                <div className={task.isDone ? "taskDone" : "task"} key={task.id}>
+                <input type="checkbox" checked={task.isDone} onChange={() => toggletaskUndone(task.id)} className={task.isDone ? "doneCheckBox" : ""} />
+                <span className={task.isdone ? "completed" : ""}> {task.text} </span>
+                <span> {task.priority}</span>
+                <span> {task.createdAt.toLocaleString()}</span>
+              </div>
+            ))}
+            </>
+            )}
+          </div>
+        </div>
+      </main>
     </>
-  )
+  );
 }
-
 export default App
