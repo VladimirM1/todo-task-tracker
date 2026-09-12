@@ -1,18 +1,66 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
 
-  const [tasks, setTasks] = useState([]);
-
   const [newTask, setNewTask] = useState("");
 
-  const [doneTasks, setDoneTasks] = useState([]);
+  const [tasks, setTasks] = useState( () => {
+    const savedTasks = localStorage.getItem("tasks");
+
+    if (!savedTasks){
+      return [];
+    }
+
+    return JSON.parse(savedTasks).map((task) => ({
+      ...task, createdAt: new Date(task.createdAt)
+    })
+
+    );
+  }
+
+  );
+
+  const [doneTasks, setDoneTasks] = useState(() => {
+    const savedDoneTasks = localStorage.getItem("doneTasks");
+
+    if (!savedDoneTasks) {
+      return [];
+    }
+
+    return JSON.parse(savedDoneTasks).map((task) => ({
+      ...task, createdAt: new Date(task.createdAt)
+    }));
+  });
 
   const [priority, setPriority] = useState("Medium");
 
+  const priorityValues = {
+    High: 3,
+    Medium: 2,
+    Low: 1
+  };
+
+  const sortedTasks = [...tasks].sort((a,b) => {
+    const priorityMath = priorityValues[b.priority] - priorityValues[a.priority];
+
+    if (priorityMath !== 0){
+      return priorityMath;
+    }
+
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  })
+
   const [filter, setFilter] = useState("toDoTasks");
   
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem("doneTasks", JSON.stringify(doneTasks));
+  }, [doneTasks]);
+
 
   function submitTask(event){
     event.preventDefault();
@@ -87,6 +135,7 @@ function App() {
           <div className="buttons">
             <button onClick={() => setFilter("toDoTasks")}>See planned tasks</button>
             <button onClick={() => setFilter("done")}>See done tasks</button>
+            <button onClick={() => setFilter("sorted")} className='sortButton'>☷  Sort </button>
           </div>
           <div className="taskList">
             {filter === "toDoTasks" && (
@@ -95,7 +144,7 @@ function App() {
                 <div className={task.isDone ? "taskDone" : "task"} key={task.id}>
                 <input type="checkbox" checked={task.isDone} onChange={() => toggleTaskDone(task.id)} className={task.isDone ? "doneCheckBox" : ""} />
                 <span className={task.isdone ? "completed" : ""}> {task.text} </span>
-                <span> {task.priority}</span>
+                <span> Priority: {task.priority}</span>
                 <span> {task.createdAt.toLocaleString()}</span>
               </div>
             ))}
@@ -108,7 +157,20 @@ function App() {
                 <div className={task.isDone ? "taskDone" : "task"} key={task.id}>
                 <input type="checkbox" checked={task.isDone} onChange={() => toggletaskUndone(task.id)} className={task.isDone ? "doneCheckBox" : ""} />
                 <span className={task.isdone ? "completed" : ""}> {task.text} </span>
-                <span> {task.priority}</span>
+                <span> Priority: {task.priority}</span>
+                <span> {task.createdAt.toLocaleString()}</span>
+              </div>
+            ))}
+            </>
+            )}
+
+            {filter === "sorted" && (
+            <>
+              {sortedTasks.map((task) => (
+                <div className={task.isDone ? "taskDone" : "task"} key={task.id}>
+                <input type="checkbox" checked={task.isDone} onChange={() => toggleTaskDone(task.id)} className={task.isDone ? "doneCheckBox" : ""} />
+                <span className={task.isdone ? "completed" : ""}> {task.text} </span>
+                <span> Priority: {task.priority}</span>
                 <span> {task.createdAt.toLocaleString()}</span>
               </div>
             ))}
