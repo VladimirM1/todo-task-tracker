@@ -113,7 +113,13 @@ function App() {
   return (
     <>
       <header>
-        <p className="descriptionClass"><span className="emojiClass">&#128198;</span> Personal planner</p>
+        <div className="headerTop" >
+          <p className="descriptionClass"><span className="emojiClass">&#128198;</span> Personal planner</p>
+          <div className="darkToggle">
+            <input type="checkbox" id="dark-mode-toggle"/>
+            <label htmlFor="dark-mode-toggle" className="toggle"></label>
+          </div>
+        </div>
         <h1>TO DO TASK TRACKER</h1>
         <p>Manage your tasks as you wish</p>
       </header>
