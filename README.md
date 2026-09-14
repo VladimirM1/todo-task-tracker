@@ -10,15 +10,9 @@ Added tasks can be:
 
 There is also possiblity to toggle dark theme.
 
-## INSTALL AND RUN
-
-``` npm install ```
-
-``` npm run dev```
+### URL: [GitPage](https://vladimirm1.github.io/todo-task-tracker)
 
 
-## URL
 
-[GitPage](https://vladimirm1.github.io/todo-task-tracker)
 
 
